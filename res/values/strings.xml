@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Movie DB</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="fill_at_least_one_filed">Please, fill at least one field in order to start search</string>
+    <string name="title_year">Year:</string>
+    <string name="title_title">Title:</string>
+
+</resources>
