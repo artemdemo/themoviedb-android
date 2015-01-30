@@ -7,5 +7,11 @@
     <string name="fill_at_least_one_filed">Please, fill at least one field in order to start search</string>
     <string name="title_year">Year:</string>
     <string name="title_title">Title:</string>
+    <string name="title_genre">Genre:</string>
+    <string name="title_actor">Actor:</string>
+    <string name="title_adultContent">Adult content</string>
+    <string name="search">Search</string>
+    <string name="adult_content_on">Adult content ON</string>
+    <string name="adult_content_off">Adult content OFF</string>
 
 </resources>
