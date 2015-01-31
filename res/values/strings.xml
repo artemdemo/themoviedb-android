@@ -13,5 +13,7 @@
     <string name="search">Search</string>
     <string name="adult_content_on">Adult content ON</string>
     <string name="adult_content_off">Adult content OFF</string>
+    <string name="movie_name">Movie name</string>
+    <string name="movie_year">Movie Year</string>
 
 </resources>
