@@ -18,5 +18,7 @@
     <string name="movie_name">Movie name</string>
     <string name="movie_year">Movie Year</string>
     <string name="ok">OK</string>
+    <string name="home">Home</string>
+    <string name="exit">Exit</string>
 
 </resources>

@@ -15,7 +15,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.DialogFragment;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -24,6 +27,8 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
@@ -74,8 +79,6 @@ public class MainActivity extends Activity {
 		progress = new ProgressDialog(this);
 		Button btnSearch = (Button) findViewById(R.id.btnSearch);
 		
-		initPopupShow("Please use correct value for Year");
-		
 		btnSearch.setOnClickListener(new View.OnClickListener() {	
 			@Override
 			public void onClick(View v) {
@@ -98,7 +101,7 @@ public class MainActivity extends Activity {
 					//new FetchData().execute();
 				} else {
 					progress.dismiss();
-					popupMessage.showAsDropDown(inputYear, 0, 0);
+					showAlert("Please use correct value for Year");
 				}
 				
 				/*
@@ -111,35 +114,46 @@ public class MainActivity extends Activity {
 		});
 	}
 	
-	public void initPopupShow( String strMsg ) {
-		popupText = new TextView(this);
-		popupButton = new Button(this);
-		layoutOfPopup = new LinearLayout(this);
-		
-		Display display = getWindowManager().getDefaultDisplay();
-		Point size = new Point();
-		display.getSize(size);
-		int windowWidth = size.x;
-		
-		popupButton.setText("OK");
-		popupText.setText( strMsg );
-		popupText.setGravity(Gravity.CENTER_HORIZONTAL);
-		popupText.setPadding(0, 0, 0, 20);
-		layoutOfPopup.setOrientation(1);
-		layoutOfPopup.setBackgroundColor(Color.LTGRAY);
-		layoutOfPopup.setGravity(Gravity.CENTER_HORIZONTAL);
-		layoutOfPopup.addView(popupText);
-		layoutOfPopup.addView(popupButton);
-		
-		popupButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				popupMessage.dismiss();
-			}
-		});
-		popupMessage = new PopupWindow(layoutOfPopup, LayoutParams.FILL_PARENT, LayoutParams.WRAP_CONTENT);
-		popupMessage.setWidth(windowWidth-40);
-		popupMessage.setContentView(layoutOfPopup);
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		if ( id == R.id.mBtnHome ) {
+			
+			
+			
+			return true;
+		} else if ( id == R.id.mBtnExit ) {
+			// Exiting application
+			DialogFragment dFragment = new AppDialogFragment();
+			dFragment.show(getFragmentManager(), "theDialog");
+			
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+
+	/*
+	 * Creating popup to show error
+	 */
+	public void showAlert( String strMsg ) {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage( strMsg )
+		       .setCancelable(false)
+		       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+		           public void onClick(DialogInterface dialog, int id) {
+		                //do things
+		           }
+		       });
+		AlertDialog alert = builder.create();
+		alert.show();
 	}
 	
 	
