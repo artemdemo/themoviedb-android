@@ -112,6 +112,17 @@ public class MainActivity extends Activity {
 				startActivity(intent);*/
 			}
 		});
+		
+		Button btnGenre = (Button) findViewById(R.id.btnGenre);
+		
+		btnGenre.setOnClickListener(new View.OnClickListener() {	
+			@Override
+			public void onClick(View v) {
+				
+				DialogFragment dFragment = new SelectGenreFragment();
+				dFragment.show(getFragmentManager(), "theSelectGenre");
+			}
+		});
 	}
 	
 	
@@ -153,7 +164,7 @@ public class MainActivity extends Activity {
 		       });
 		AlertDialog alert = builder.create();
 		alert.show();
-	}
+	};
 	
 	
 	/**
