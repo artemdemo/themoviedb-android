@@ -98,7 +98,7 @@ public class MainActivity extends Activity {
 				
 				if ( intYear > 1900 && intYear < intCurrentYear ) {
 					strUrl = ApiFactory.getMoviesByYearUrl(intYear);
-					//new FetchData().execute();
+					new FetchData().execute();
 				} else {
 					progress.dismiss();
 					showAlert("Please use correct value for Year");
@@ -117,7 +117,8 @@ public class MainActivity extends Activity {
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.main, menu);
+		// Creating menu
+		getMenuInflater().inflate(R.menu.home, menu);
 		return true;
 	}
 
@@ -125,8 +126,6 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if ( id == R.id.mBtnHome ) {
-			
-			
 			
 			return true;
 		} else if ( id == R.id.mBtnExit ) {

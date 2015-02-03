@@ -7,11 +7,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.app.DialogFragment;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -86,6 +90,31 @@ public class SingleMovieActivity extends Activity {
 			}
 		}
 		
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Creating menu
+		getMenuInflater().inflate(R.menu.main, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		if ( id == R.id.mBtnHome ) {
+			Intent i = new Intent(this, MainActivity.class);
+	        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	        startActivity(i);
+			return true;
+		} else if ( id == R.id.mBtnExit ) {
+			// Exiting application
+			DialogFragment dFragment = new AppDialogFragment();
+			dFragment.show(getFragmentManager(), "theDialog");
+			
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 	/**
