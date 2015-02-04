@@ -2,6 +2,7 @@ package me.artemdemo.moviedb;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class GenresList {
 
@@ -22,6 +23,26 @@ public class GenresList {
 		}
 		
 		return jsonArrGenres;
-	}
+	};
+	
+	/**
+	 * Return genre name by its index (position in the array)
+	 * 
+	 * @param {int} index
+	 * @return {String}
+	 */
+	public static String getGenreNameByIndex( int index ) {
+		String strName = "";
+		JSONArray jsonArrGenres = getGenres();
+		JSONObject objGenre;
+		try {
+			objGenre = jsonArrGenres.getJSONObject( index );
+			strName = objGenre.getString("name");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return strName;
+	};
 	
 }

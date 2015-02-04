@@ -124,8 +124,17 @@ public class MainActivity extends Activity {
 	/*
 	 * This method will be called from SelectGenreFragment
 	 */
-	public void setGenres(ArrayList<Integer> Arraylist) {
-		Log.v(TAG, "setGenres");
+	public void setGenres(ArrayList<Integer> arrGenres) {
+		String strGenres = "";
+		for (int i = 0; i < arrGenres.size(); i++) {
+			strGenres = strGenres + GenresList.getGenreNameByIndex(arrGenres.get(i).intValue());
+			if ( i < arrGenres.size() - 1 ) {
+				strGenres = strGenres + ", ";
+			}
+		}
+		if ( strGenres == "" ) strGenres = "Select genre";
+		Button btnSearch = (Button) findViewById(R.id.btnGenre);
+		btnSearch.setText(strGenres);
 	};
 	
 	
