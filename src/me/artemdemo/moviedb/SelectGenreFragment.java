@@ -2,6 +2,10 @@ package me.artemdemo.moviedb;
 
 import java.util.ArrayList;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
@@ -22,8 +26,35 @@ public class SelectGenreFragment extends DialogFragment {
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
 		
 		selectedItemsIndexList = new ArrayList();
-		String[] items = new String[] {"one", "two", "three", "one", "two", "three", "one", "two", "three", "one", "two", "three"};
-		boolean[] checkedItems = {false, false, false, false, false, false, false, false, false, false, false, false };
+		// Get JSON array of genres from GenresList class
+		JSONArray jsonArrGenres = GenresList.getGenres();
+		// Genre items
+		ArrayList<String> arrStrGenres = new ArrayList<String>();
+		// Boolean for checked items
+		ArrayList<Boolean> arrBoolGenres = new ArrayList<Boolean>();
+		
+		if ( jsonArrGenres != null ) {
+			for (int i = 0; i < jsonArrGenres.length(); i++) {
+				try {
+					JSONObject objGenre = jsonArrGenres.getJSONObject(i);
+					arrStrGenres.add( objGenre.getString("name") );
+					arrBoolGenres.add(false );
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		//Converting ArrayList of strings to primitive arrays
+		String[] items = new String[arrStrGenres.size()];
+		items = arrStrGenres.toArray(items);
+		
+		//Converting ArrayList of booleans to primitive arrays (it can't be done as easy as with strings arraylist)
+		final boolean[] checkedItems = new boolean[arrBoolGenres.size()];
+	    int index = 0;
+	    for (Boolean object : arrBoolGenres) {
+	    	checkedItems[index++] = object;
+	    }
 		
 		AlertDialog.Builder theDialog = new AlertDialog.Builder( getActivity() );
 		
@@ -45,15 +76,8 @@ public class SelectGenreFragment extends DialogFragment {
 			
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
-				/*
-				 * Exiting application.
-				 * Android's design does not favor exiting an application by choice, but rather manages it by the OS. 
-				 * I can bring up the Home application by its corresponding Intent
-				 */
-				Intent intent = new Intent(Intent.ACTION_MAIN);
-				intent.addCategory(Intent.CATEGORY_HOME);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(intent);
+				MainActivity callingActivity = (MainActivity) getActivity();
+		        callingActivity.setGenres(selectedItemsIndexList);
 			}
 		});
 		

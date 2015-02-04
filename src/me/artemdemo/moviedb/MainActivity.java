@@ -3,6 +3,7 @@ package me.artemdemo.moviedb;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 import org.apache.http.HttpEntity;
@@ -20,17 +21,12 @@ import android.app.DialogFragment;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Point;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -124,6 +120,13 @@ public class MainActivity extends Activity {
 			}
 		});
 	}
+	
+	/*
+	 * This method will be called from SelectGenreFragment
+	 */
+	public void setGenres(ArrayList<Integer> Arraylist) {
+		Log.v(TAG, "setGenres");
+	};
 	
 	
 	@Override
