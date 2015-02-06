@@ -60,6 +60,10 @@ public class MainActivity extends Activity {
 	 */
 	public static ArrayList<Integer> selectedGenres = null;
 	
+	public int intYear = 0;
+
+	public ApiFactory.SearchType currentSearchType;
+	
 	/*
 	 * Popup show variables
 	 */
@@ -88,7 +92,7 @@ public class MainActivity extends Activity {
 				
 				EditText inputYear = (EditText) findViewById(R.id.inputYear);
 				String strYear = inputYear.getText().toString();
-				int intYear = 0;
+				
 				int intCurrentYear = Calendar.getInstance().get(Calendar.YEAR);
 				
 				if(strYear != null && !strYear.isEmpty()) {
@@ -96,7 +100,8 @@ public class MainActivity extends Activity {
 				}
 				
 				if ( intYear > 1900 && intYear < intCurrentYear ) {
-					strUrl = ApiFactory.getMoviesByYearUrl(intYear);
+					currentSearchType = ApiFactory.SearchType.BY_YEAR;
+					strUrl = ApiFactory.getMoviesByYearUrl(intYear, 1);
 					new FetchData().execute();
 				} else {
 					progress.dismiss();
@@ -239,11 +244,7 @@ public class MainActivity extends Activity {
 			
 			progress.dismiss();
 			
-			try {
-				Log.v(TAG, resultJSONObject.getString("total_pages"));
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
+			// Log.v(TAG, resultJSONObject.getString("total_pages"));
 			
 			Intent intent = new Intent("android.intent.action.SRESULTS");
 			JSONArray searchResults;
@@ -252,6 +253,12 @@ public class MainActivity extends Activity {
 			try {
 				searchResults = resultJSONObject.getJSONArray("results");
 				intent.putExtra("searchResults", searchResults.toString());
+				intent.putExtra("searchType", currentSearchType.toString());
+				switch(currentSearchType){
+					case BY_YEAR:
+						intent.putExtra("intYear", intYear);
+						break;
+				}
 			} catch (JSONException e) {
 				e.printStackTrace();
 			}

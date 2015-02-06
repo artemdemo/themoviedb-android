@@ -24,12 +24,12 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.ListView;
-import android.widget.Toast;
 
 public class SearchResultsActivity extends ListActivity {
 
@@ -47,28 +47,60 @@ public class SearchResultsActivity extends ListActivity {
 	static String strResult;
 	
 	/*
+	 * Following arrays will contain data about list of results
+	 */
+	private List<String> searchResultsMovieIds = new ArrayList<String>();
+	private List<String> searchResultsMovieNames = new ArrayList<String>();
+	private List<String> searchResultsMovieYear = new ArrayList<String>();
+	
+	/*
+	 * I will use this variable in determining whether user reached last item or not
+	 */
+	private int preLast;
+	
+	private int currentPage = 1;
+	
+	private enum httpAction {
+		GET_MOVIE, GET_NEXT_PAGE
+	};
+	
+	private httpAction currentAction;
+	
+	/*
+	 * currentSearchType - used to determine what search type I'm using
+	 * For different types I need to fetch different parameters from extra data
+	 */
+	private ApiFactory.SearchType currentSearchType;
+	
+	private int intYear = 0; // Will be filled with real data if needed for next search
+	
+	/*
 	 * Waiting popup
 	 */
 	static ProgressDialog progress;
 	
-	private static final String TAG = "MovieDB-main";
+	private static final String TAG = "MovieDB-searchResults2014";
+	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
 		
 		Bundle extras = getIntent().getExtras();
-		List<String> searchResultsMovieIds = new ArrayList<String>();
-		List<String> searchResultsMovieNames = new ArrayList<String>();
-		List<String> searchResultsMovieYear = new ArrayList<String>();
 		JSONArray searchResults = null;
 		
 		// Converting string to JSON
 		if (extras != null) {
 			try {
 				String jsonString = extras.getString("searchResults");
+				currentSearchType = ApiFactory.SearchType.valueOf(extras.getString("searchType"));
+				switch(currentSearchType) {
+					case BY_YEAR:
+						intYear = extras.getInt("intYear");
+						break;
+				}
 		        searchResults = new JSONArray(jsonString);
-			    Log.v(TAG, searchResults.length() + "" );
+		      //Log.v(TAG, extras.getString("searchType") );
 			} catch (JSONException e) {
 			    e.printStackTrace();
 			}
@@ -92,6 +124,44 @@ public class SearchResultsActivity extends ListActivity {
 	    // Printing results
 		SearchResultsAdapter adapter = new SearchResultsAdapter(this, searchResultsMovieIds, searchResultsMovieNames, searchResultsMovieYear);
 	    setListAdapter(adapter);
+	    
+	    // Adding scroll listener to current list view
+	    ListView listViewResults = getListView();
+	    listViewResults.setOnScrollListener(new OnScrollListener(){
+	    	
+	    	/*
+	    	 * Waiting popup
+	    	 */
+	    	//private ProgressDialog progress;
+
+			@Override
+			public void onScrollStateChanged(AbsListView view, int scrollState) {
+			}
+
+			@Override
+			public void onScroll(AbsListView lv, int firstVisibleItem,
+					int visibleItemCount, int totalItemCount) {
+				switch(lv.getId()) {
+			        case android.R.id.list:     
+			           // Sample calculation to determine if the last 
+			           // item is fully visible.
+			           final int lastItem = firstVisibleItem + visibleItemCount;
+			           if(lastItem == totalItemCount) {
+							if(preLast != lastItem){ // avoiding multiple calls for last item
+								progress = new ProgressDialog(SearchResultsActivity.this);
+								progress.setTitle("Loading");
+								progress.setMessage("Wait while loading...");
+								progress.show();
+								
+								currentAction = httpAction.GET_NEXT_PAGE;
+								strUrl = ApiFactory.getMoviesByYearUrl(intYear, currentPage);
+								new FetchData().execute();
+								
+								preLast = lastItem;
+							}
+			           }
+			    }
+			}});
 	}
 	
 	@Override
@@ -102,6 +172,8 @@ public class SearchResultsActivity extends ListActivity {
 		progress.setTitle("Loading");
 		progress.setMessage("Wait while loading...");
 		progress.show();
+		
+		currentAction = httpAction.GET_MOVIE;
 		
 		strUrl = ApiFactory.getMovieById(movieId);
 		new FetchData().execute();
@@ -137,6 +209,35 @@ public class SearchResultsActivity extends ListActivity {
 		return super.onOptionsItemSelected(item);
 	}
 	
+	/*
+	 * Add results of next page to the current page
+	 */
+	public void addResultsToMovieList(String strResults) {
+		try {
+			JSONObject resultJSONObject = new JSONObject(strResults);
+			JSONArray searchResults = resultJSONObject.getJSONArray("results");
+			for(int i = 0; i < searchResults.length(); i++) {
+			    try {
+					JSONObject objMovie = searchResults.getJSONObject(i);
+					String fullDate = objMovie.getString("release_date");
+					searchResultsMovieIds.add( objMovie.getString("id") );
+					searchResultsMovieNames.add( objMovie.getString("original_title") );
+					searchResultsMovieYear.add( fullDate.substring(0, 4) ); // I need only year
+					
+					// Printing results
+					SearchResultsAdapter adapter = new SearchResultsAdapter(this, searchResultsMovieIds, searchResultsMovieNames, searchResultsMovieYear);
+				    setListAdapter(adapter);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 	
 	
 	/**
@@ -153,8 +254,6 @@ public class SearchResultsActivity extends ListActivity {
 			
 			httpget.setHeader("Content-type", "application/json");
 			InputStream inputStream = null;
-			
-			String result = null;
 			
 			try {
 				HttpResponse response = httpclient.execute(httpget);
@@ -190,9 +289,17 @@ public class SearchResultsActivity extends ListActivity {
 			
 			progress.dismiss();
 
-			Intent intent = new Intent("android.intent.action.SMOVIE");
-			intent.putExtra("singleMovieData", strResult); // Passing movie data to the Single Movie Activity		
-			startActivity(intent);
+			switch(currentAction) {
+				case GET_MOVIE:
+					Intent intent = new Intent("android.intent.action.SMOVIE");
+					intent.putExtra("singleMovieData", strResult); // Passing movie data to the Single Movie Activity		
+					startActivity(intent);
+					break;
+				case GET_NEXT_PAGE:
+					addResultsToMovieList(result); // Adding results to current list of movies
+					currentPage++;
+					break;
+			}
 		}
 		
 	}
