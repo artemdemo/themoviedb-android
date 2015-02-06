@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import me.artemdemo.moviedb.fragments.AppDialogFragment;
+import me.artemdemo.moviedb.fragments.SearchResultsAdapter;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;

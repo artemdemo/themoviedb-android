@@ -1,6 +1,9 @@
-package me.artemdemo.moviedb;
+package me.artemdemo.moviedb.fragments;
 
 import java.util.ArrayList;
+
+import me.artemdemo.moviedb.GenresList;
+import me.artemdemo.moviedb.MainActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,8 +40,18 @@ public class SelectGenreFragment extends DialogFragment {
 			for (int i = 0; i < jsonArrGenres.length(); i++) {
 				try {
 					JSONObject objGenre = jsonArrGenres.getJSONObject(i);
+					Boolean selectedGenre = false;
 					arrStrGenres.add( objGenre.getString("name") );
-					arrBoolGenres.add(false );
+					if ( MainActivity.selectedGenres != null ) {
+						for (int intGenre : MainActivity.selectedGenres) {
+							if ( intGenre == i ) {
+								selectedGenre = true;
+								selectedItemsIndexList.add(intGenre);
+								break;
+							}
+						}
+					}
+					arrBoolGenres.add(selectedGenre);
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}

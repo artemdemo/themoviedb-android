@@ -2,6 +2,8 @@ package me.artemdemo.moviedb;
 
 import java.io.InputStream;
 
+import me.artemdemo.moviedb.fragments.AppDialogFragment;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -1,4 +1,4 @@
-package me.artemdemo.moviedb;
+package me.artemdemo.moviedb.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

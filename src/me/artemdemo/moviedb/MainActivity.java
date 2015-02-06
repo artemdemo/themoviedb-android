@@ -6,6 +6,9 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+import me.artemdemo.moviedb.fragments.AppDialogFragment;
+import me.artemdemo.moviedb.fragments.SelectGenreFragment;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -53,6 +56,11 @@ public class MainActivity extends Activity {
 	static ProgressDialog progress;
 	
 	/*
+	 * This variable will contain selected genres
+	 */
+	public static ArrayList<Integer> selectedGenres = null;
+	
+	/*
 	 * Popup show variables
 	 */
 	LinearLayout layoutOfPopup;
@@ -63,11 +71,6 @@ public class MainActivity extends Activity {
 	private static final String TAG = "MovieDB-main";
 	
 	@Override
-	/*
-	 * Starting up application
-	 * (non-Javadoc)
-	 * @see android.app.Activity#onCreate(android.os.Bundle)
-	 */
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
@@ -109,12 +112,13 @@ public class MainActivity extends Activity {
 			}
 		});
 		
+		/*
+		 * Choose genre button
+		 */
 		Button btnGenre = (Button) findViewById(R.id.btnGenre);
-		
 		btnGenre.setOnClickListener(new View.OnClickListener() {	
 			@Override
 			public void onClick(View v) {
-				
 				DialogFragment dFragment = new SelectGenreFragment();
 				dFragment.show(getFragmentManager(), "theSelectGenre");
 			}
@@ -126,6 +130,7 @@ public class MainActivity extends Activity {
 	 */
 	public void setGenres(ArrayList<Integer> arrGenres) {
 		String strGenres = "";
+		
 		for (int i = 0; i < arrGenres.size(); i++) {
 			strGenres = strGenres + GenresList.getGenreNameByIndex(arrGenres.get(i).intValue());
 			if ( i < arrGenres.size() - 1 ) {
@@ -133,6 +138,8 @@ public class MainActivity extends Activity {
 			}
 		}
 		if ( strGenres == "" ) strGenres = "Select genre";
+		else selectedGenres = arrGenres; // Saving genres for the future use
+		
 		Button btnSearch = (Button) findViewById(R.id.btnGenre);
 		btnSearch.setText(strGenres);
 	};
@@ -148,14 +155,10 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
-		if ( id == R.id.mBtnHome ) {
-			
-			return true;
-		} else if ( id == R.id.mBtnExit ) {
+		if ( id == R.id.mBtnExit ) {
 			// Exiting application
 			DialogFragment dFragment = new AppDialogFragment();
 			dFragment.show(getFragmentManager(), "theDialog");
-			
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
@@ -171,7 +174,7 @@ public class MainActivity extends Activity {
 		       .setCancelable(false)
 		       .setPositiveButton("OK", new DialogInterface.OnClickListener() {
 		           public void onClick(DialogInterface dialog, int id) {
-		                //do things
+		                //ok clicked
 		           }
 		       });
 		AlertDialog alert = builder.create();
@@ -179,10 +182,9 @@ public class MainActivity extends Activity {
 	};
 	
 	
-	/**
+	/*
 	 * FetchData is fetching data from the server
 	 * Class will use 'url' variable - be sure that it is set before you instantiating this class
-	 *
 	 */
 	private class FetchData extends AsyncTask<String, String, String> {
 

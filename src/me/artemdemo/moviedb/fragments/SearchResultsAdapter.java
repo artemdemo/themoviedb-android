@@ -1,6 +1,10 @@
-package me.artemdemo.moviedb;
+package me.artemdemo.moviedb.fragments;
 
 import java.util.List;
+
+import me.artemdemo.moviedb.R;
+import me.artemdemo.moviedb.R.id;
+import me.artemdemo.moviedb.R.layout;
 
 import android.content.Context;
 import android.view.LayoutInflater;
