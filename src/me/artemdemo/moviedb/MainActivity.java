@@ -242,8 +242,6 @@ public class MainActivity extends Activity {
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
 			
-			progress.dismiss();
-			
 			// Log.v(TAG, resultJSONObject.getString("total_pages"));
 			
 			Intent intent = new Intent("android.intent.action.SRESULTS");
@@ -264,6 +262,7 @@ public class MainActivity extends Activity {
 			}
 			
 			startActivity(intent);
+			progress.dismiss();
 		}
 		
 	}

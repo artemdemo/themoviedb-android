@@ -24,6 +24,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -52,6 +53,8 @@ public class SearchResultsActivity extends ListActivity {
 	private List<String> searchResultsMovieIds = new ArrayList<String>();
 	private List<String> searchResultsMovieNames = new ArrayList<String>();
 	private List<String> searchResultsMovieYear = new ArrayList<String>();
+	private int listPositionIndex = 0; // after new content loaded I need to scroll it to the last position
+	private int listPositionTop = 0;
 	
 	/*
 	 * I will use this variable in determining whether user reached last item or not
@@ -148,13 +151,20 @@ public class SearchResultsActivity extends ListActivity {
 			           final int lastItem = firstVisibleItem + visibleItemCount;
 			           if(lastItem == totalItemCount) {
 							if(preLast != lastItem){ // avoiding multiple calls for last item
+								// Save list position to scroll here after data is loaded
+								listPositionIndex = lv.getFirstVisiblePosition();
+								View v = lv.getChildAt(0);
+								listPositionTop = (v == null) ? 0 : (v.getTop() - lv.getPaddingTop());
+								
 								progress = new ProgressDialog(SearchResultsActivity.this);
 								progress.setTitle("Loading");
 								progress.setMessage("Wait while loading...");
 								progress.show();
 								
 								currentAction = httpAction.GET_NEXT_PAGE;
+								currentPage++;
 								strUrl = ApiFactory.getMoviesByYearUrl(intYear, currentPage);
+								Log.v(TAG, strUrl);
 								new FetchData().execute();
 								
 								preLast = lastItem;
@@ -216,6 +226,7 @@ public class SearchResultsActivity extends ListActivity {
 		try {
 			JSONObject resultJSONObject = new JSONObject(strResults);
 			JSONArray searchResults = resultJSONObject.getJSONArray("results");
+			//Log.v(TAG, resultJSONObject.getString("page"));
 			for(int i = 0; i < searchResults.length(); i++) {
 			    try {
 					JSONObject objMovie = searchResults.getJSONObject(i);
@@ -227,6 +238,8 @@ public class SearchResultsActivity extends ListActivity {
 					// Printing results
 					SearchResultsAdapter adapter = new SearchResultsAdapter(this, searchResultsMovieIds, searchResultsMovieNames, searchResultsMovieYear);
 				    setListAdapter(adapter);
+				    ListView listViewResults = getListView();
+				    listViewResults.setSelectionFromTop(listPositionIndex, listPositionTop);
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
@@ -286,8 +299,6 @@ public class SearchResultsActivity extends ListActivity {
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
-			
-			progress.dismiss();
 
 			switch(currentAction) {
 				case GET_MOVIE:
@@ -297,9 +308,9 @@ public class SearchResultsActivity extends ListActivity {
 					break;
 				case GET_NEXT_PAGE:
 					addResultsToMovieList(result); // Adding results to current list of movies
-					currentPage++;
 					break;
 			}
+			progress.dismiss();
 		}
 		
 	}
