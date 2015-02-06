@@ -20,6 +20,6 @@
 	    android:layout_marginBottom="5dp"
 	    android:layout_marginLeft="5dp"
 	    android:text="@string/movie_year"
-	    android:textSize="20px" />
+	    android:textSize="14sp" />
     
 </LinearLayout>
