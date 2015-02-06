@@ -97,7 +97,7 @@ public class SearchResultsActivity extends ListActivity {
 		if (extras != null) {
 			try {
 				String jsonString = extras.getString("searchResults");
-				totalPages = extras.getInt("totalPages");
+				totalPages = Integer.parseInt( extras.getString("totalPages") );
 				currentSearchType = ApiFactory.SearchType.valueOf(extras.getString("searchType"));
 				switch(currentSearchType) {
 					case BY_YEAR:

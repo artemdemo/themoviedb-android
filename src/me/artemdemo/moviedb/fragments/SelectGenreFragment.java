@@ -90,7 +90,7 @@ public class SelectGenreFragment extends DialogFragment {
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
 				MainActivity callingActivity = (MainActivity) getActivity();
-		        callingActivity.setGenres(selectedItemsIndexList);
+		        //callingActivity.setGenres(selectedItemsIndexList);
 			}
 		});
 		

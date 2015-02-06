@@ -136,37 +136,8 @@ public class MainActivity extends Activity {
 			}
 		});
 		
-		/*
-		 * Choose genre button
-		 */
-		Button btnGenre = (Button) findViewById(R.id.btnGenre);
-		btnGenre.setOnClickListener(new View.OnClickListener() {	
-			@Override
-			public void onClick(View v) {
-				DialogFragment dFragment = new SelectGenreFragment();
-				dFragment.show(getFragmentManager(), "theSelectGenre");
-			}
-		});
 	}
 	
-	/*
-	 * This method will be called from SelectGenreFragment
-	 */
-	public void setGenres(ArrayList<Integer> arrGenres) {
-		String strGenres = "";
-		
-		for (int i = 0; i < arrGenres.size(); i++) {
-			strGenres = strGenres + GenresList.getGenreNameByIndex(arrGenres.get(i).intValue());
-			if ( i < arrGenres.size() - 1 ) {
-				strGenres = strGenres + ", ";
-			}
-		}
-		if ( strGenres == "" ) strGenres = "Select genre";
-		else selectedGenres = arrGenres; // Saving genres for the future use
-		
-		Button btnSearch = (Button) findViewById(R.id.btnGenre);
-		btnSearch.setText(strGenres);
-	};
 	
 	
 	@Override
