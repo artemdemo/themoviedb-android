@@ -62,6 +62,7 @@ public class SearchResultsActivity extends ListActivity {
 	private int preLast;
 	
 	private int currentPage = 1;
+	private int totalPages = 1;
 	
 	private enum httpAction {
 		GET_MOVIE, GET_NEXT_PAGE
@@ -96,6 +97,7 @@ public class SearchResultsActivity extends ListActivity {
 		if (extras != null) {
 			try {
 				String jsonString = extras.getString("searchResults");
+				totalPages = extras.getInt("totalPages");
 				currentSearchType = ApiFactory.SearchType.valueOf(extras.getString("searchType"));
 				switch(currentSearchType) {
 					case BY_YEAR:
@@ -117,12 +119,14 @@ public class SearchResultsActivity extends ListActivity {
 					String fullDate = objMovie.getString("release_date");
 					searchResultsMovieIds.add( objMovie.getString("id") );
 					searchResultsMovieNames.add( objMovie.getString("original_title") );
-					searchResultsMovieYear.add( fullDate.substring(0, 4) ); // I need only year
+					if ( fullDate.isEmpty() ) searchResultsMovieYear.add( "" );
+					else searchResultsMovieYear.add( fullDate.substring(0, 4) ); // I need only year
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			}
 		};
+		
 		
 	    // Printing results
 		SearchResultsAdapter adapter = new SearchResultsAdapter(this, searchResultsMovieIds, searchResultsMovieNames, searchResultsMovieYear);
@@ -151,21 +155,22 @@ public class SearchResultsActivity extends ListActivity {
 			           final int lastItem = firstVisibleItem + visibleItemCount;
 			           if(lastItem == totalItemCount) {
 							if(preLast != lastItem){ // avoiding multiple calls for last item
-								// Save list position to scroll here after data is loaded
-								listPositionIndex = lv.getFirstVisiblePosition();
-								View v = lv.getChildAt(0);
-								listPositionTop = (v == null) ? 0 : (v.getTop() - lv.getPaddingTop());
-								
-								progress = new ProgressDialog(SearchResultsActivity.this);
-								progress.setTitle("Loading");
-								progress.setMessage("Wait while loading...");
-								progress.show();
-								
-								currentAction = httpAction.GET_NEXT_PAGE;
-								currentPage++;
-								strUrl = ApiFactory.getMoviesByYearUrl(intYear, currentPage);
-								Log.v(TAG, strUrl);
-								new FetchData().execute();
+								if ( currentPage < totalPages ) {
+									// Save list position to scroll here after data is loaded
+									listPositionIndex = lv.getFirstVisiblePosition();
+									View v = lv.getChildAt(0);
+									listPositionTop = (v == null) ? 0 : (v.getTop() - lv.getPaddingTop());
+									
+									progress = new ProgressDialog(SearchResultsActivity.this);
+									progress.setTitle("Loading");
+									progress.setMessage("Wait while loading...");
+									progress.show();
+									
+									currentAction = httpAction.GET_NEXT_PAGE;
+									currentPage++;
+									strUrl = ApiFactory.getMoviesByYearUrl(intYear, currentPage);
+									new FetchData().execute();
+								}
 								
 								preLast = lastItem;
 							}
@@ -264,6 +269,7 @@ public class SearchResultsActivity extends ListActivity {
 		protected String doInBackground(String... params) {
 			DefaultHttpClient httpclient = new DefaultHttpClient( new BasicHttpParams() );
 			HttpGet httpget = new HttpGet(strUrl);
+			Log.v(TAG, strUrl);
 			
 			httpget.setHeader("Content-type", "application/json");
 			InputStream inputStream = null;

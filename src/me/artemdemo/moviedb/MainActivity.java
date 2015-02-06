@@ -85,29 +85,48 @@ public class MainActivity extends Activity {
 		btnSearch.setOnClickListener(new View.OnClickListener() {	
 			@Override
 			public void onClick(View v) {
-				
-				progress.setTitle("Loading");
-				progress.setMessage("Wait while loading...");
-				progress.show();
-				
+				strUrl = "";
 				EditText inputYear = (EditText) findViewById(R.id.inputYear);
 				String strYear = inputYear.getText().toString();
-				
 				int intCurrentYear = Calendar.getInstance().get(Calendar.YEAR);
 				
 				if(strYear != null && !strYear.isEmpty()) {
 					intYear = Integer.parseInt(strYear);
-				}
-				
-				if ( intYear > 1900 && intYear < intCurrentYear ) {
-					currentSearchType = ApiFactory.SearchType.BY_YEAR;
-					strUrl = ApiFactory.getMoviesByYearUrl(intYear, 1);
-					new FetchData().execute();
+					if ( intYear > 1900 && intYear < intCurrentYear ) {
+						currentSearchType = ApiFactory.SearchType.BY_YEAR;
+						strUrl = ApiFactory.getMoviesByYearUrl(intYear, 1);
+					} else {
+						progress.dismiss();
+						showAlert("Please use correct value for Year");
+					}
 				} else {
-					progress.dismiss();
-					showAlert("Please use correct value for Year");
+					intYear = 0;
 				}
 				
+				EditText inputTitle = (EditText) findViewById(R.id.inputTitle);
+				String strTitle = inputTitle.getText().toString();
+				
+				if(strTitle != null && !strTitle.isEmpty()) {
+					if (intYear > 0) {
+						currentSearchType = ApiFactory.SearchType.BY_YEAR_AND_TITLE;
+						strUrl = ApiFactory.getMoviesByYearAndTitleUrl(intYear, strTitle, 1);
+					} else {
+						currentSearchType = ApiFactory.SearchType.BY_TITLE;
+						strUrl = ApiFactory.getMoviesByTitleUrl(strTitle, 1);
+					}
+				}
+				
+
+				/*
+				 * Check if we can make api call
+				 */
+				if ( strUrl != "" ) {
+					progress.setTitle("Loading");
+					progress.setMessage("Wait while loading...");
+					progress.show();
+					new FetchData().execute();
+				}
+
 				/*
 				 * DUMMY functionality
 				Intent intent = new Intent("android.intent.action.SRESULTS");
@@ -197,6 +216,7 @@ public class MainActivity extends Activity {
 		protected String doInBackground(String... params) {
 			DefaultHttpClient httpclient = new DefaultHttpClient( new BasicHttpParams() );
 			HttpGet httpget = new HttpGet(strUrl);
+			Log.v(TAG, strUrl);
 			
 			httpget.setHeader("Content-type", "application/json");
 			InputStream inputStream = null;
@@ -252,6 +272,7 @@ public class MainActivity extends Activity {
 				searchResults = resultJSONObject.getJSONArray("results");
 				intent.putExtra("searchResults", searchResults.toString());
 				intent.putExtra("searchType", currentSearchType.toString());
+				intent.putExtra("totalPages", resultJSONObject.getString("total_pages"));
 				switch(currentSearchType){
 					case BY_YEAR:
 						intent.putExtra("intYear", intYear);
